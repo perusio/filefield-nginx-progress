@@ -1,7 +1,13 @@
 // $Id: 
 
-FileField Nginx Progress 6.x-0.1, 2010-07-06
+FileField Nginx Progress 6.x-1.0, 2010-07-06
 -----------------------------------
 
-- Initial 6.x release.
+- Initial commit to drupal.org
+
+
+FileField Nginx Progress 6.x-0.1, 2010-06-19
+-----------------------------------
+
+- Initial 6.x release. (on github)
 
