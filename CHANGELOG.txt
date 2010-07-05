@@ -1,0 +1,7 @@
+// $Id: 
+
+FileField Nginx Progress 6.x-0.1, 2010-07-06
+-----------------------------------
+
+- Initial 6.x release.
+

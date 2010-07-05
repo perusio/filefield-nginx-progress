@@ -1,0 +1,6 @@
+; $Id;
+name = FileField Nginx Progress
+description = Adds upload progress functionality for Nginx webservers
+dependencies[] = filefield
+package = CCK
+core = 6.x

@@ -1,0 +1,124 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Adds upload progress functionality to FileFields on the nginx webserver.
+ */
+
+
+/**
+ * Implementation of hook_menu().
+ */
+function filefield_nginx_progress_menu() {
+  $items = array();
+
+  $items['filefield_nginx_progress'] = array(
+    'page callback' => 'filefield_nginx_progress',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Menu callback for nginx upload progress.
+ */
+function filefield_nginx_progress($key) {
+  $progress = array(
+    'message' => t('Starting upload...'),
+    'percentage' => -1,
+  );
+
+  $status = nginx_progress_fetch($key);
+  if ($status['state'] == 'uploading') {
+    $progress['message'] = t('Uploading... (@current of @total)', array('@current' => format_size($status['received']), '@total' => format_size($status['size'])));
+    $progress['percentage'] = round(100 * $status['received'] / $status['size']);
+  }
+
+  drupal_json($progress);
+}
+
+/**
+ * Implementation of hook_elements().
+ */
+function filefield_nginx_progress_elements() {
+  $elements = array();
+
+  foreach (module_invoke_all('filefield_nginx_progress_widgets') as $widget) {
+    $elements[$widget]['#process'] = array('filefield_nginx_progress_process');
+  }
+  return $elements;
+}
+
+/**
+ * Implementation of hook_filefield_nginx_progress_widgets().
+ *
+ * This returns a list of widgets that are compatible with FileField Nginx Progress.
+ */
+function filefield_nginx_progress_filefield_nginx_progress_widgets() {
+  return array('filefield_widget', 'imagefield_widget');
+}
+
+/**
+ * A #process callback to extend the filefield_widget element type.
+ *
+ * To get the field working with nginx upload progress, we need to enable the progress bar
+ * and modify the ahah paths to work with the nginx redirection.
+ */
+function filefield_nginx_progress_process($element, $edit, &$form_state, $form) {
+  // Generate upload progress key
+  $upload_progress_key = md5(mt_rand());
+
+  // Nginx really wants us to send a get value, but form_expand_ahah doesn't
+  // allow query strings in paths. The work around is to add the progress id
+  // into the path and to rewrite at the nginx level to the required url.
+  $element['filefield_upload']['#ahah']['path'] .= '/x-progress-id:' . $upload_progress_key;
+
+  // Add the upload key to the form, in a manner compatible with the existing
+  // javascript
+  $element['UPLOAD_IDENTIFIER'] = array(
+    '#type' => 'hidden',
+    '#value' => $upload_progress_key,
+    '#attributes' => array('class' => 'filefield-progress'),
+  );
+
+  // Unset this as a precaution in the unlikely event that apc upload progress
+  // is enabled in php.ini
+  unset($element['APC_UPLOAD_PROGRESS']);
+
+  // Enable the progress bar
+  $element['filefield_upload']['#ahah']['progress']['type'] = 'bar';
+
+  // Modify the upload progress callback to use our own menu callback.
+  $element['filefield_upload']['#ahah']['progress']['path'] = 'filefield_nginx_progress/' . $upload_progress_key;
+
+  return $element;
+}
+
+/**
+ * Fetch the upload progress from nginx using the X-Progress-ID parameter
+ *
+ * Since the javascript returned by the progress tracking in nginx is not
+ * compatible with the ahah progress bar, we need to get drupal to issue an
+ * http request and then parse the response.
+ *
+ */
+function nginx_progress_fetch($key) {
+  $url = url('progress', array('query' => 'X-Progress-ID=' . $key, 'absolute' => TRUE));
+  $response = drupal_http_request($url);
+  $status = array();
+  // strip the extraneous parts out leaving a comma delimited list.
+  if (preg_match("/\{(.*)\}/", $response->data, $matches) ) {
+    $items = explode(',', $matches[1]);
+    foreach ($items as $item) {
+      $array = explode(':', $item);
+      // strip quotes and spaces from key & value pair
+      $key = trim($array[0], "' ");
+      $value = trim($array[1], "' ");
+      $status[$key] = $value;
+    }
+  }
+  return $status;
+}
