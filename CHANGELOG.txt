@@ -1,5 +1,10 @@
 // $Id: 
 
+FileField Nginx Progress 6.x-1.01, 2010-08-18
+-----------------------------------
+- #876564 Updated to work when drupal is located in a subdir
+
+
 FileField Nginx Progress 6.x-1.0, 2010-07-06
 -----------------------------------
 
