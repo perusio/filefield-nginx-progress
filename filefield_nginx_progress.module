@@ -107,15 +107,7 @@ function filefield_nginx_progress_process($element, $edit, &$form_state, $form) 
  */
 function nginx_progress_fetch($key) {
   // Find root url of server
-  if (isset($_SERVER['SERVER_NAME'])) {
-    $domain = $_SERVER['SERVER_NAME'];
-    if ($_SERVER['SERVER_PORT'] != 80) {
-      $domain .= ':' . $_SERVER['SERVER_PORT'];
-    }
-  }
-  elseif (isset($_SERVER['HTTP_HOST'])) {
-      $domain = $_SERVER['HTTP_HOST'];
-  }
+  $domain = $_SERVER['HTTP_HOST'];
   $proto = $_SERVER['HTTPS'] ? 'https://' : 'http://';
   $base_url = $proto . $domain;
 
