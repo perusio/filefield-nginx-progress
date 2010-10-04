@@ -1,0 +1,94 @@
+<?php
+
+
+/**
+ * @file   filefield_nginx_progress.install
+ * @date   Sat Aug 21 15:36:37 2010
+ * 
+ * @brief Install file for the filefield_nginx_progress module. The module
+ *        implements a upload progress bar for filefield.
+ * 
+ */
+
+
+/** 
+ * Implementation of hook_install(). 
+ *
+ */
+function filefield_nginx_progress_install() {
+  // Alter the module weight to make sure we come after filefield.
+  db_query(
+    "UPDATE {system} SET weight = '%d' WHERE name = 'filefield_nginx_progress'",
+    db_result(
+      db_query("SELECT weight from {system} WHERE name = 'filefield'")) + 1);  
+} // filefield_nginx_progress_install
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * Display information about getting upload progress bars working.
+ * Mostly stolen from the filefield install file.
+ */
+function filefield_nginx_progress_requirements($phase) {
+
+  $requirements = array();
+  // Ensure translations don't break at install time
+  $t = get_t();
+  // The nginx upload progress module wiki page link.
+  $nginx_http_progress_link = l($t('upload progress module'), 'http://wiki.nginx.org/NginxHttpUploadProgressModule');
+
+  if ($phase == 'runtime') {
+    // Compare the PHP version. Only works with versions > 5.2.0.
+    if (!version_compare(phpversion(), '5.2.0', '>')) {
+      $value = $t('Not enabled');
+      $description = $t('Your server is not capable of displaying file upload progress. File upload progress requires PHP 5.2 and nginx with the ' . $nginx_http_progress_link . ' compiled in.');
+      $severity = REQUIREMENT_INFO;
+    }
+    else {
+      $value = $t('Enabled (' . $nginx_http_progress_link . ' )');
+      $severity = REQUIREMENT_OK;
+    }
+    // We override the filefield_progress entry of the $requirements array set
+    // by the filefield module. The values are just filler. Anything will do. 
+    $requirements['filefield_progress'] = array(
+      'title' => $t('Upload progress Apache'),
+      'value' => $t('not enabled'),
+      'description' => $t('Not using Apache web server'),
+    );
+
+    $requirements['filefield_nginx_progress'] = array(
+      'title' => $t('Upload progress nginx'),
+      'value' => $value,
+      'severity' => $severity,
+      'description' => $description,
+    );
+  } // runtime
+
+  return $requirements;
+} // filefield_nginx_progress_requirements
+
+
+/** 
+ * 
+ * Set the upload progress in the status report page.
+ * 
+ */
+function filefield_nginx_progress_update_6100() {
+  $ret = array();
+
+  $filefield_weight = db_result(db_query("SELECT weight from {system} WHERE name = 'filefield'"));
+
+  $filefield_nginx_progress_weight = db_result(db_query("SELECT weight from {system} WHERE name = 'filefield_nginx_progress'"));
+
+  // If the weight of filefield_nginx_progress is already greater than the
+  // weight of filefield return immediately.
+  if ($filefield_nginx_progress_weight > $filefield_weight) {
+    $ret = array('success' => TRUE, 'query' => t('The module filefield_nginx_progress will be loaded after filefield.'));
+  }
+  else {
+    // Otherwise we update the weight of filefield_nginx_progress.
+    $ret = update_sql("UPDATE {system} SET weight = " . strval($filefield_weight + 1) . " WHERE name = 'filefield_nginx_progress'");
+  }
+
+  return $ret;
+} // filefield_nginx_progress_update_6100
