@@ -48,13 +48,6 @@ function filefield_nginx_progress_requirements($phase) {
       $value = $t('Enabled (' . $nginx_http_progress_link . ' )');
       $severity = REQUIREMENT_OK;
     }
-    // We override the filefield_progress entry of the $requirements array set
-    // by the filefield module. The values are just filler. Anything will do. 
-    $requirements['filefield_progress'] = array(
-      'title' => $t('Upload progress Apache'),
-      'value' => $t('not enabled'),
-      'description' => $t('Not using Apache web server'),
-    );
 
     $requirements['filefield_nginx_progress'] = array(
       'title' => $t('Upload progress nginx'),
