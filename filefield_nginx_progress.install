@@ -46,6 +46,7 @@ function filefield_nginx_progress_requirements($phase) {
     }
     else {
       $value = $t('Enabled (' . $nginx_http_progress_link . ' )');
+      $description = '';
       $severity = REQUIREMENT_OK;
     }
 
