@@ -5,7 +5,6 @@
  * Adds upload progress functionality to FileFields on the nginx webserver.
  */
 
-
 /**
  * Implementation of hook_menu().
  */
@@ -13,7 +12,7 @@ function filefield_nginx_progress_menu() {
   $items = array();
 
   $items['filefield_nginx_progress'] = array(
-    'page callback' => 'filefield_nginx_progress',
+    'page callback' => 'filefield_nginx_progress_ajax',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
@@ -24,29 +23,29 @@ function filefield_nginx_progress_menu() {
 /**
  * Menu callback for nginx upload progress.
  */
-function filefield_nginx_progress($key) {
+function filefield_nginx_progress_ajax($key) {
   $progress = array(
     'message' => t('Starting upload...'),
     'percentage' => -1,
   );
-
+  
   $status = nginx_progress_fetch($key);
   if ($status['state'] == 'uploading') {
     $progress['message'] = t('Uploading... (@current of @total)', array('@current' => format_size($status['received']), '@total' => format_size($status['size'])));
     $progress['percentage'] = round(100 * $status['received'] / $status['size']);
   }
 
-  drupal_json($progress);
+  drupal_json_output($progress);
 }
 
 /**
- * Implementation of hook_elements().
+ * Implementation of hook_element_info().
  */
-function filefield_nginx_progress_elements() {
+function filefield_nginx_progress_element_info() {
   $elements = array();
 
   foreach (module_invoke_all('filefield_nginx_progress_widgets') as $widget) {
-    $elements[$widget]['#process'] = array('filefield_nginx_progress_process');
+    $elements[$widget]['#process'] = array('filefield_nginx_progress_element_process');
   }
   return $elements;
 }
@@ -57,30 +56,30 @@ function filefield_nginx_progress_elements() {
  * This returns a list of widgets that are compatible with FileField Nginx Progress.
  */
 function filefield_nginx_progress_filefield_nginx_progress_widgets() {
-  return array('filefield_widget', 'imagefield_widget');
+  return array('managed_file');
 }
 
 /**
- * A #process callback to extend the filefield_widget element type.
+ * A #process callback to extend the file_widget element type.
  *
  * To get the field working with nginx upload progress, we need to enable the progress bar
  * and modify the ahah paths to work with the nginx redirection.
  */
-function filefield_nginx_progress_process($element, $edit, &$form_state, $form) {
+function filefield_nginx_progress_element_process($element, &$form_state, $form) {
   // Generate upload progress key
-  $upload_progress_key = md5(mt_rand());
+  $upload_progress_key = mt_rand();
 
   // Nginx really wants us to send a get value, but form_expand_ahah doesn't
   // allow query strings in paths. The work around is to add the progress id
   // into the path and to rewrite at the nginx level to the required url.
-  $element['filefield_upload']['#ahah']['path'] .= '/x-progress-id:' . $upload_progress_key;
+  $element['upload_button']['#ajax']['path'] .= '/x-progress-id:' . $upload_progress_key;
 
   // Add the upload key to the form, in a manner compatible with the existing
   // javascript
   $element['UPLOAD_IDENTIFIER'] = array(
     '#type' => 'hidden',
     '#value' => $upload_progress_key,
-    '#attributes' => array('class' => 'filefield-progress'),
+    '#attributes' => array('class' => array('file-progress')),
   );
 
   // Unset this as a precaution in the unlikely event that apc upload progress
@@ -88,10 +87,10 @@ function filefield_nginx_progress_process($element, $edit, &$form_state, $form) 
   unset($element['APC_UPLOAD_PROGRESS']);
 
   // Enable the progress bar
-  $element['filefield_upload']['#ahah']['progress']['type'] = 'bar';
+  $element['upload_button']['#ajax']['progress']['type'] = 'bar';
 
   // Modify the upload progress callback to use our own menu callback.
-  $element['filefield_upload']['#ahah']['progress']['path'] = 'filefield_nginx_progress/' . $upload_progress_key;
+  $element['upload_button']['#ajax']['progress']['path'] = 'filefield_nginx_progress/' . $upload_progress_key;
 
   return $element;
 }
@@ -107,10 +106,10 @@ function filefield_nginx_progress_process($element, $edit, &$form_state, $form) 
 function nginx_progress_fetch($key) {
   // Find root url of server
   $domain = $_SERVER['HTTP_HOST'];
-  $proto = $_SERVER['HTTPS'] ? 'https://' : 'http://';
+  $proto = !empty($_SERVER['HTTPS']) ? 'https://' : 'http://';
   $base_url = $proto . $domain;
 
-  $url = url($base_url . '/progress', array('query' => 'X-Progress-ID=' . $key, 'absolute' => TRUE, 'external' => TRUE));
+  $url = url($base_url . '/progress', array('query' => array('X-Progress-ID' => $key), 'absolute' => TRUE, 'external' => TRUE));
 
   $response = drupal_http_request($url);
   $status = array();

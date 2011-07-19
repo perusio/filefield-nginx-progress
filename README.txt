@@ -1,6 +1,6 @@
 // $Id:
 
-The FileField Nginx Progress module expands FileField's javascript
+The FileField Nginx Progress module expands the File field's javascript
 upload progress bar to work with the nginx webserver (when compiled
 with the upload progress module).
 
@@ -11,7 +11,7 @@ FileField Nginx Progress was written and is maintained by Ben Osman (smoothify).
 Required Drupal Modules
 --------------------------
 
-* FileField                   - http://drupal.org/project/filefield
+* File                        - Part of Drupal 7 Core
 
 
 Required Nginx Modules 
@@ -25,7 +25,7 @@ Module Usage
 
 This module currently has no configuration options, simply install it
 in drupal and it will add the upload progress functionality to all
-FileFields and ImageFields.
+File and Image fields.
 
 However, for it to work your nginx must be set up correctly.
 

@@ -1,18 +1,5 @@
 // $Id: 
 
-FileField Nginx Progress 6.x-1.1, 2010-08-18
+FileField Nginx Progress 7.x-dev, 2011-02-05
 -----------------------------------
-- #876564 Updated to work when drupal is located in a subdir
-
-
-FileField Nginx Progress 6.x-1.0, 2010-07-06
------------------------------------
-
-- Initial commit to drupal.org
-
-
-FileField Nginx Progress 6.x-0.1, 2010-06-19
------------------------------------
-
-- Initial 6.x release. (on github)
-
+- #952814 Start of Drupal 7 version.
