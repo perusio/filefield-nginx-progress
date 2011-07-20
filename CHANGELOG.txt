@@ -1,5 +1,0 @@
-// $Id: 
-
-FileField Nginx Progress 7.x-dev, 2011-02-05
------------------------------------
-- #952814 Start of Drupal 7 version.
