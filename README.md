@@ -103,13 +103,15 @@ The configuration consists in three parts:
         service nginx reload
      
  5. Done.    
-     
+
  
 ## TODO
  
  1. Use the `X-Progress-ID` header instead of issuing a GET request
     and relying on the above rewrite. It will make the configuration
-    easier to understand and faster.
+    easier to understand and faster. This development occurs in the
+    7.x-2.x branch. This implies a divergence from the way the
+    progress bar support is implemented in the file module (core). 
      
  2. Make the 7.x version work correctly. Currently there are some
     problems with it as can be seen on the issue queue.
