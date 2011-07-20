@@ -119,4 +119,4 @@ The configuration consists in three parts:
 This module development is done by
 [smoothify](http://drupal.org/user/115335) sponsored by the
 [Spirit Library](http://spiritlibrary.com) and
-[perusio](http://drupal.org/user/8859), currently focusing on the D7 version.
+[perusio](http://drupal.org/user/8859) &mdash; focusing on the D7 version.
