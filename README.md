@@ -76,8 +76,8 @@ The configuration consists in three parts:
         ## that it report the progress of the upload through a GET
         ## request. But the drupal form element makes use of clean
         ## URLs in the POST.
-        location ~ (.*)/x-progress-id:(\w*) {
-           rewrite ^(.*)/x-progress-id:(\w*)  $1?X-Progress-ID=$2;
+        location ~ (?<upload_form_uri>.*)/x-progress-id:(?<upload_id>\d*) {
+           rewrite ^ $upload_form_uri?X-Progress-ID=$upload_id;
         }
 
         ## Now the above rewrite must be matched by a location that
@@ -89,7 +89,10 @@ The configuration consists in three parts:
  
  3. Now on **each** location where you want the upload progress bar
     to work you must enable it like on this example.
-        
+     
+    N.B. The `track_uploads` directive must be the **last** in a given
+    location.
+     
         location = /index.php {
            include fastcgi.conf;
            fastcgi_pass phpcgi;
@@ -103,18 +106,10 @@ The configuration consists in three parts:
         service nginx reload
      
  5. Done.    
-
  
 ## TODO
  
- 1. Use the `X-Progress-ID` header instead of issuing a GET request
-    and relying on the above rewrite. It will make the configuration
-    easier to understand and faster. This development occurs in the
-    7.x-2.x branch. This implies a divergence from the way the
-    progress bar support is implemented in the file module (core). 
-     
- 2. Make the 7.x version work correctly. Currently there are some
-    problems with it as can be seen on the issue queue.
+ 1. Suggest a configuration and verify it using a `hook_requirements()`.
      
 ## Credits & Acknowledgments
 

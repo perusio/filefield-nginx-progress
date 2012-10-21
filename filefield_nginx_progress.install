@@ -1,16 +1,15 @@
 <?php
 
 /**
- * @file   filefield_nginx_progress.install
- * 
+ * @file  filefield_nginx_progress.install
+ *
  * @brief Install file for the filefield_nginx_progress module. The module
  *        implements a upload progress bar for filefield.
- * 
+ *
  */
 
-
-/** 
- * Implementation of hook_install(). 
+/**
+ * Implementation of hook_install().
  *
  */
 function filefield_nginx_progress_install() {
@@ -59,12 +58,10 @@ function filefield_nginx_progress_requirements($phase) {
 
   return $requirements;
 } // filefield_nginx_progress_requirements
-
-
-/** 
- * 
+/**
+ *
  * Set the upload progress in the status report page.
- * 
+ *
  */
 function filefield_nginx_progress_update_7100() {
   db_update('system')

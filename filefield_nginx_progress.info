@@ -1,6 +1,6 @@
 ; $Id;
 name = FileField Nginx Progress
-description = Adds upload progress functionality for Nginx webservers
+description = Adds upload progress functionality for Nginx
 
 files[] = filefield_nginx_progress.install
 files[] = filefield_nginx_progress.module
