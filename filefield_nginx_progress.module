@@ -130,9 +130,5 @@ function nginx_progress_fetch($key) {
   $response = drupal_http_request($url, array('headers' => array('X-Progress-ID' => $key)));
 
   // Decode the JSON response.
-  preg_match('/\{(.*)\}/', $response->data, $matches);
-  if (!empty($matches[0])) {
-    return json_decode($matches[0], TRUE);
-  }
-  return FALSE;
+  return drupal_json_decode($response->data);
 } // nginx_progress_fetch
