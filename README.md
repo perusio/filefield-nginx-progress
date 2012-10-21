@@ -44,6 +44,12 @@ module to do that or just rely on PHP FastCGI support for RFC 1867.
     compiled in. Now you need to support the upload progress bar in
     the Nginx configuration.
     
+## Upgrade from versions prior to 7.x-2.1 for Drupal 7
+   
+ Now it uses a pure JSON output. If you upgrade you must add
+ `upload_progress_json_output` to the `/progress` location or the
+ progress bar it won't work.
+    
 ## Instalation 
 
  1. Install the module as usual from
@@ -84,6 +90,7 @@ The configuration consists in three parts:
         ## activates it and references the above defined upload
         ## tracking zone.
         locate ^~ /progress {
+           upload_progress_json_output;
            report_uploads uploads;
         }
  
