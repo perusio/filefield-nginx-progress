@@ -124,7 +124,7 @@ function filefield_nginx_progress_element_process($element, &$form_state, $form)
 function nginx_progress_fetch($key) {
   global $base_url, $base_path;
 
-  $url = url($base_url . $base_path. 'progress', array('absolute' => TRUE, 'external' => TRUE));
+  $url = url("$base_url/progress", array('absolute' => TRUE, 'external' => TRUE));
   // We get the response using an header instead of a query string. This
   // mimics what is given as example on the module README.
   $response = drupal_http_request($url, array('headers' => array('X-Progress-ID' => $key)));
