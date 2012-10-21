@@ -129,17 +129,10 @@ function nginx_progress_fetch($key) {
   // mimics what is given as example on the module README.
   $response = drupal_http_request($url, array('headers' => array('X-Progress-ID' => $key)));
 
-  $status = array();
-  // Strip the extraneous parts out leaving a comma delimited list.
-  if (preg_match("/\{(.*)\}/", $response->data, $matches) ) {
-    $items = explode(',', $matches[1]);
-    foreach ($items as $item) {
-      $response_array = explode(':', $item);
-      // Strip quotes and spaces from key-value pair.
-      $key = trim($response_array[0], "' ");
-      $value = trim($response_array[1], "' ");
-      $status[$key] = $value;
-    }
+  // Decode the JSON response.
+  preg_match('/\{(.*)\}/', $response->data, $matches);
+  if (!empty($matches[0])) {
+    return json_decode($matches[0], TRUE);
   }
-  return $status;
+  return FALSE;
 } // nginx_progress_fetch
