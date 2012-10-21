@@ -122,7 +122,7 @@ function filefield_nginx_progress_element_process($element, &$form_state, $form)
  *   An array with the status information for the progress bar.
  */
 function nginx_progress_fetch($key) {
-  global $base_url, $base_path;
+  global $base_url;
 
   $url = url("$base_url/progress", array('absolute' => TRUE, 'external' => TRUE));
   // We get the response using an header instead of a query string. This
