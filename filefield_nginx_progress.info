@@ -5,6 +5,6 @@ files[] = filefield_nginx_progress.install
 files[] = filefield_nginx_progress.module
 
 dependencies[] = file
-package = CCK
+package = Fields
 core = 7.x
 php = 5.2
